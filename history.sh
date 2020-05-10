@@ -24,9 +24,8 @@ id=$RANDOM
 fifo="${TMPDIR:-/tmp}/iex-history-fzf-fifo-$id"
 mkfifo -m o+w $fifo
 
-
-tmux split-window "iex-history | fzf > $fifo"
-tmux send-keys -lt $current_pane $(cat $fifo)
+tmux split-window "iex-history | fzf -s > $fifo"
+tmux send-keys -t $current_pane -l "$(cat $fifo)"
 
 # remove the fifo
 rm -f $fifo
