@@ -1,9 +1,9 @@
-defmodule History.MixProject do
+defmodule IexHistory.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :history,
+      app: :"iex-history",
       version: "0.1.0",
       elixir: "~> 1.10",
       elixirc_paths: ["."],
@@ -12,6 +12,6 @@ defmodule History.MixProject do
   end
 
   defp escript do
-    [main_module: History]
+    [main_module: IexHistory]
   end
 end

@@ -21,7 +21,7 @@ if [ "$pane_current_command" != "beam.smp" ]; then
 fi
 
 id=$RANDOM
-fifo="${TMPDIR:-/tmp}/iex-history-fzf-fifo-$id"
+fifo="${TMPDIR:-/tmp}/iex-history-fifo-$id"
 mkfifo -m o+w $fifo
 
 tmux split-window "iex-history | fzf -s > $fifo"
