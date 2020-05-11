@@ -1,4 +1,4 @@
-defmodule History do
+defmodule IexHistory do
   @doc """
     See erlang log history log impl
     https://github.com/erlang/otp/blob/da04cc20cc1527d142ab1890a44c277f450bfe7f/lib/kernel/src/group_history.erl
