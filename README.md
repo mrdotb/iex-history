@@ -1,6 +1,6 @@
 # iex-history
 
-![preview](demo.svg)
+![preview](demo.gif)
 
 ## Installation
 
