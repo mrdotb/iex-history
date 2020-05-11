@@ -19,8 +19,12 @@ cd ~/.iex-history
 mix escript.build
 ```
 
+Move the generated binary to somewhere in your `$PATH` or add `~/.iex-history` folder to your `$PATH`
+
 Add the following line in your tmux config
 
 ```bash
 bind C-r run "bash ~/.iex-history/history.sh #{session_name} #{window_id} #D #{pane_current_command}"
 ```
+
+The binding I use is tmux prefix ctrl-r.
