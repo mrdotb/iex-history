@@ -84,6 +84,7 @@ defmodule IexHistory do
 
   defp print_logs(logs) do
     List.delete_at(logs, 0)
+    |> Enum.reverse()
     |> Enum.each(&IO.write/1)
   end
 
