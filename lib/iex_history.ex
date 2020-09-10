@@ -1,8 +1,8 @@
 defmodule IexHistory do
   @doc """
-    See erlang log history log impl
+    See erlang log history log implementationa.
     https://github.com/erlang/otp/blob/da04cc20cc1527d142ab1890a44c277f450bfe7f/lib/kernel/src/group_history.erl
-    The only change is the mode we have to put in :read_only
+    The only change is: the mode we have to put in :read_only
   """
 
   @default_history_file 'erlang-shell-log'
@@ -69,8 +69,33 @@ defmodule IexHistory do
   end
 
   defp read_full_log(name) do
-    :disk_log.chunk(name, :start)
+    case :disk_log.chunk(name, :start) do
+      {:error, :no_such_log} ->
+        []
+
+      :eof ->
+        []
+
+      {cont, logs} ->
+        Enum.reverse(maybe_drop_header(logs) ++ read_full_log(name, cont))
+    end
   end
+
+  defp read_full_log(name, cont) do
+    case :disk_log.chunk(name, cont) do
+      {:error, :no_such_log} ->
+        []
+
+      :eof ->
+        []
+
+      {nextCont, logs} ->
+        maybe_drop_header(logs) ++ read_full_log(name, nextCont)
+    end
+  end
+
+  defp maybe_drop_header([{:vsn, _} | rest]), do: rest
+  defp maybe_drop_header(logs), do: logs
 
   defp open_log() do
     opts = log_options()
@@ -83,24 +108,21 @@ defmodule IexHistory do
   end
 
   defp print_logs(logs) do
-    List.delete_at(logs, 0)
-    |> Enum.reverse()
-    |> Enum.each(&IO.write/1)
+    # List.delete_at(logs, 0)
+    Enum.each(logs, &IO.write/1)
   end
 
   def main(_args) do
-    {{:continuation, _pid, _ret, _}, logs} =
-      case open_log() do
-        {:ok, log_name} ->
-          read_full_log(log_name)
+    case open_log() do
+      {:ok, log_name} ->
+        read_full_log(log_name)
 
-        {:repaired, log_name, {:recovered, _}, {:badbytes, _}} ->
-          read_full_log(log_name)
+      {:repaired, log_name, {:recovered, _}, {:badbytes, _}} ->
+        read_full_log(log_name)
 
-        {:error, reason} ->
-          report_error(reason)
-      end
-
-    print_logs(logs)
+      {:error, reason} ->
+        report_error(reason)
+    end
+    |> print_logs()
   end
 end
