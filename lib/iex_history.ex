@@ -1,8 +1,8 @@
 defmodule IexHistory do
   @doc """
-    See erlang log history log implementationa.
-    https://github.com/erlang/otp/blob/da04cc20cc1527d142ab1890a44c277f450bfe7f/lib/kernel/src/group_history.erl
-    The only change is: the mode we have to put in :read_only
+  See erlang log history log implementationa.
+  https://github.com/erlang/otp/blob/da04cc20cc1527d142ab1890a44c277f450bfe7f/lib/kernel/src/group_history.erl
+  The only change is: the mode we have to put in :read_only
   """
 
   @default_history_file 'erlang-shell-log'
@@ -55,12 +55,12 @@ defmodule IexHistory do
       {:format, :internal},
       {:type, :wrap},
       {:size, size},
-      {:distributed, []},
       {:notify, false},
       {:head, {:vsn, @vsn}},
       {:quiet, true},
       {:mode, :read_only}
     ]
+    |> IO.inspect()
   end
 
   defp ensure_path(opts) do
@@ -103,12 +103,13 @@ defmodule IexHistory do
     :disk_log.open(opts)
   end
 
-  defp report_error(_reason) do
-    # TODO
+  defp report_error(reason) do
+    IO.write(:stderr, "#{inspect(reason)}")
   end
 
+  defp print_logs(nil), do: ""
+
   defp print_logs(logs) do
-    # List.delete_at(logs, 0)
     Enum.each(logs, &IO.write/1)
   end
 
