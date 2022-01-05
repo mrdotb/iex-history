@@ -24,7 +24,7 @@ Move the generated binary to somewhere in your `$PATH` or add `~/.iex-history` f
 Add the following line in your tmux config
 
 ```bash
-bind C-r run "bash ~/.iex-history/history.sh #{session_name} #{window_id} #D #{pane_current_command}"
+bind C-r run-shell -b "bash ~/.iex-history/history.sh #{session_name} #{window_id} #D #{pane_current_command}"
 ```
 
 The binding I use is tmux prefix ctrl-r.
