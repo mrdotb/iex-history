@@ -1,21 +1,22 @@
 defmodule IexHistory do
-  @doc """
-  See erlang log history log implementationa.
-  https://github.com/erlang/otp/blob/da04cc20cc1527d142ab1890a44c277f450bfe7f/lib/kernel/src/group_history.erl
-  The only change is: the mode we have to put in :read_only
+  @moduledoc """
+  See erlang group history for more details
+  https://github.com/erlang/otp/blob/master/lib/kernel/src/group_history.erl
+
+  We need to rewrite some part because
+  disk_log:open without :read_only opts break new history line
+  for the current session
   """
 
   @default_history_file 'erlang-shell-log'
   @max_history_files 10
   # 512 kb total default
   @default_size 1024 * 512
-  # @default_status :disabled
   # 50 kb, in bytes
   @min_history_size 50 * 1024
   # @default_drop []
   # @disk_log_format :internal # since we want repairs
   @log_name "$#group_history"
-  # @mode :read_only
   @vsn {0, 1, 0}
 
   defp find_path() do
@@ -60,7 +61,6 @@ defmodule IexHistory do
       {:quiet, true},
       {:mode, :read_only}
     ]
-    |> IO.inspect()
   end
 
   defp ensure_path(opts) do
@@ -89,8 +89,8 @@ defmodule IexHistory do
       :eof ->
         []
 
-      {nextCont, logs} ->
-        maybe_drop_header(logs) ++ read_full_log(name, nextCont)
+      {next_cont, logs} ->
+        maybe_drop_header(logs) ++ read_full_log(name, next_cont)
     end
   end
 
@@ -116,14 +116,13 @@ defmodule IexHistory do
   def main(_args) do
     case open_log() do
       {:ok, log_name} ->
-        read_full_log(log_name)
+        log_name |> read_full_log() |> print_logs()
 
       {:repaired, log_name, {:recovered, _}, {:badbytes, _}} ->
-        read_full_log(log_name)
+        log_name |> read_full_log() |> print_logs()
 
       {:error, reason} ->
         report_error(reason)
     end
-    |> print_logs()
   end
 end
