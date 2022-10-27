@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 # vim: noai:ts=4:sw=4:expandtab
 
-# exit the script if any statement returns a non-true return value
-set -e
+# exit when a command fails instead of continuing
+set -o errexit
+# exit when access an unset variable
+set -o nounset
+# make pipeline fail exit when access an unset variable
+set -o pipefail
+
 
 # (session_name window_id pane_id pane_current_command)
 # echo "$@"
@@ -24,7 +29,7 @@ id=$RANDOM
 fifo="${TMPDIR:-/tmp}/iex-history-fifo-$id"
 mkfifo -m o+w $fifo
 
-tmux split-window "iex-history | fzf -s > $fifo"
+tmux split-window "iex-history | fzf --multi -s > $fifo"
 tmux send-keys -t $current_pane -l "$(cat $fifo)"
 
 # remove the fifo
